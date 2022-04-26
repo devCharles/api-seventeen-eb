@@ -3,14 +3,15 @@ const Post = require("../../models/posts").model;
 
 
 const get = async () => {
-    //devuelve todos los usuarios
+    //devuelve todos los pots
     return await Post.find({}).exec();
 
 }
 
 const getById = async (id) => {
-    return await Post.findById(id).exec();
-    //devuelve un usuario
+    const post =  await Post.findById(id).populate("user").exec();
+    return post;
+    //devuelve un post
 }
 
 
@@ -47,7 +48,7 @@ const create = async (PostData) => {
 }
 
 const update = async (id, PostData) => {
-    // actualizar usuario
+    // actualizar post
     const { 
         title,
         tags,
@@ -85,10 +86,13 @@ const patch = async (id, PostData) => {
 };
 
 const del = async (id) => {
-    // Eliminar un usuario
+    // Eliminar un post
     return await Post.findByIdAndDelete(id).exec();
 };
 
+const getByTitle = async(title)=>{
+    return await Post.findOne({title}).exec();
+}
 module.exports = {
     get,
     getById,
@@ -96,4 +100,5 @@ module.exports = {
     update,
     del,
     patch,
+    getByTitle,
 };

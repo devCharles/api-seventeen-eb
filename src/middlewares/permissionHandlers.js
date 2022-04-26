@@ -1,9 +1,14 @@
 const adminHandler = async (req, res, next) => {
-    /*try {
+
+
+    try {
       console.log("req.params", req.params);
-      const { role } = req.params.tokenPayload;
-      console.log(role);
-      if (role != "admin") {
+      const { sub } = req.params.tokenPayload;
+      const {_id} = req.body;
+      console.log(sub);
+      console.log(_id);
+      if (sub != _id) {
+      
         throw new Error("No tienes permisos para realizar esta acción");
       }
   
@@ -13,7 +18,7 @@ const adminHandler = async (req, res, next) => {
         success: false,
         message: err.message,
       });
-    } */
+    } 
   };
   
   const staffHandler = async (req, res, next) => {

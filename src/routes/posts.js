@@ -39,7 +39,28 @@ router.get("/",  async (req,res,next)=>{
    
 });
 
-router.post("/",  async (req,res,next)=>
+router.post("/search",  async (req,res,next)=>{
+    try{
+
+       const { title } = req.body;
+  
+        const retrievedTitle = await post.getByTitle(title);
+    
+
+    
+        res.json({success: true,
+                  payload: retrievedTitle});
+                  console.log("entre busqueda by title")
+    
+    }catch(error)
+    {
+        next(error);
+
+    }
+   
+});
+
+router.post("/",  authHandler, async (req,res,next)=>
 {
     try{
 
@@ -76,7 +97,7 @@ router.post("/",  async (req,res,next)=>
     
 });
 
-router.put("/:id",  async (req,res,next)=>{
+router.put("/:id", authHandler,  adminHandler, async (req,res,next)=>{
     try{
 
         const{id}= req.params;
@@ -106,7 +127,7 @@ router.put("/:id",  async (req,res,next)=>{
     }
 })
 
-router.patch("/:id",   async (req, res, next) => {
+router.patch("/:id",  authHandler,  adminHandler, async (req, res, next) => {
     try {
       const { id } = req.params;
   
@@ -122,7 +143,7 @@ router.patch("/:id",   async (req, res, next) => {
     }
   });
   
-  router.delete("/:id",   async (req, res, next) => {
+  router.delete("/:id",  authHandler, adminHandler, async (req, res, next) => {
     try {
       const { id } = req.params;
   
