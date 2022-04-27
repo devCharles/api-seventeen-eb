@@ -60,27 +60,15 @@ router.post("/search",  async (req,res,next)=>{
    
 });
 
-router.post("/",  authHandler, async (req,res,next)=>
+router.post("/",   async (req,res,next)=>
 {
     try{
 
-              const {title, 
-                tags, 
-                reactions, 
-                comments, 
-                publishDate, 
-                imageUrl, 
-                description, 
-                user} = req.body;
+              const {postID, title, tags, counterReactions, counterComents, datetime,
+                image, contentText,day, month, year, user} = req.body;
         const postCreated = await post.create(
-            {title, 
-            tags, 
-            reactions, 
-            comments, 
-            publishDate, 
-            imageUrl, 
-            description, 
-            user
+            {postID, title, tags, counterReactions, counterComents, datetime,
+                image, contentText,day, month, year, user
         });
     
         res.json({
@@ -97,21 +85,16 @@ router.post("/",  authHandler, async (req,res,next)=>
     
 });
 
-router.put("/:id", authHandler,  adminHandler, async (req,res,next)=>{
+router.put("/:id",  async (req,res,next)=>{
     try{
 
         const{id}= req.params;
-        const {title, tags, reactions, comments, publishDate, imageUrl, description, user} = req.body;
+        const {postID, title, tags, counterReactions, counterComents, datetime,
+            image, contentText,day, month, year, user} = req.body;
         const postUpdated = await post.update(
             id,
-            {title, 
-             tags, 
-             reactions, 
-             comments, 
-             publishDate, 
-             imageUrl, 
-             description, 
-             user
+            {postID, title, tags, counterReactions, counterComents, datetime,
+                image, contentText,day, month, year, user
         });
     
         res.json({
@@ -127,7 +110,7 @@ router.put("/:id", authHandler,  adminHandler, async (req,res,next)=>{
     }
 })
 
-router.patch("/:id",  authHandler,  adminHandler, async (req, res, next) => {
+router.patch("/:id",   async (req, res, next) => {
     try {
       const { id } = req.params;
   
@@ -143,11 +126,22 @@ router.patch("/:id",  authHandler,  adminHandler, async (req, res, next) => {
     }
   });
   
-  router.delete("/:id",  authHandler, adminHandler, async (req, res, next) => {
+  router.delete("/:id",    async (req, res, next) => {
     try {
       const { id } = req.params;
-  
-      const postDeleted = await post.del(id);
+      const { sub } = req.params.tokenPayload;
+      
+      let postDeleted;
+      if(await post.verifyUserId(id, sub))
+      {
+          console.log("borrar")
+        postDeleted = await post.del(id);
+      }
+      else
+      {
+          throw new Error("No tienes permisos para borrar este post");
+      }
+      
   
       res.json({
         success: true,

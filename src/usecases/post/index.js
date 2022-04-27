@@ -4,7 +4,7 @@ const Post = require("../../models/posts").model;
 
 const get = async () => {
     //devuelve todos los pots
-    return await Post.find({}).exec();
+    return await Post.find().populate("user").exec();
 
 }
 
@@ -21,25 +21,13 @@ const getById = async (id) => {
 //compare password
 const create = async (PostData) => {
 
-    const { title,
-        tags,
-        reactions,
-        comments,
-        publishDate,
-        imageUrl,
-        description,
-        user } = PostData;
+    const { postID, title, tags, counterReactions, counterComents, datetime,
+        image, contentText,day, month, year, user } = PostData;
 
 
     const newPost = new Post({
-        title,
-        tags,
-        reactions,
-        comments,
-        publishDate,
-        imageUrl,
-        description,
-        user
+        postID, title, tags, counterReactions, counterComents, datetime,
+  image, contentText,day, month, year, user
     });
 
     const savedPost = await newPost.save();
@@ -50,26 +38,14 @@ const create = async (PostData) => {
 const update = async (id, PostData) => {
     // actualizar post
     const { 
-        title,
-        tags,
-        reactions,
-        comments,
-        publishDate,
-        imageUrl,
-        description,
-        user } = PostData;
+        postID, title, tags, counterReactions, counterComents, datetime,
+  image, contentText,day, month, year, user } = PostData;
 
     const updatedPost = await Post.findByIdAndUpdate(
         id,
         {
-            title,
-            tags,
-            reactions,
-            comments,
-            publishDate,
-            imageUrl,
-            description,
-            user
+            postID, title, tags, counterReactions, counterComents, datetime,
+  image, contentText,day, month, year, user
         },
         { new: true }
     ).exec();
@@ -87,11 +63,25 @@ const patch = async (id, PostData) => {
 
 const del = async (id) => {
     // Eliminar un post
+    const post =  await Post.findById(id).populate("user").exec();
+    
+    
+
     return await Post.findByIdAndDelete(id).exec();
 };
 
 const getByTitle = async(title)=>{
     return await Post.findOne({title}).exec();
+}
+
+
+const verifyUserId = async(id, sub)=>{
+
+    const post =  await Post.findById(id).populate("user").exec();
+    console.log("verifyUserId post", post, sub == post.user._id)
+    return (sub == post.user._id);  
+
+    
 }
 module.exports = {
     get,
@@ -101,4 +91,5 @@ module.exports = {
     del,
     patch,
     getByTitle,
+    verifyUserId,
 };
