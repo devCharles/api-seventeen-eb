@@ -7,7 +7,7 @@ const config = require("./src/lib/config")
 const app = express();
 const port = config.app.port;
 
-app.use(cors());
+app.use(cors({}));
 
 app.use(express.json());
 

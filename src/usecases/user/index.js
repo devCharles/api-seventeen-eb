@@ -21,6 +21,8 @@ const getByEmail = async (email) => {
 }
 
 const authenticate = async(user, password) => {
+    console.log("password", password)
+    console.log("user.password", user.password)
     hash = user.password;
     return await encrypt.verifyPassword(password, hash);
 }
