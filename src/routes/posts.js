@@ -60,12 +60,16 @@ router.post("/search",  async (req,res,next)=>{
    
 });
 
-router.post("/",   async (req,res,next)=>
+router.post("/",  authHandler, async (req,res,next)=>
 {
     try{
 
+        const { sub }= req.params.tokenPayload;
+
+        let user = {_id: sub};
+
               const {postID, title, tags, counterReactions, counterComents, datetime,
-                image, contentText,day, month, year, user} = req.body;
+                image, contentText,day, month, year} = req.body;
         const postCreated = await post.create(
             {postID, title, tags, counterReactions, counterComents, datetime,
                 image, contentText,day, month, year, user
@@ -85,7 +89,7 @@ router.post("/",   async (req,res,next)=>
     
 });
 
-router.put("/:id",  async (req,res,next)=>{
+router.put("/:id",  authHandler ,async (req,res,next)=>{
     try{
 
         const{id}= req.params;
@@ -110,12 +114,26 @@ router.put("/:id",  async (req,res,next)=>{
     }
 })
 
-router.patch("/:id",   async (req, res, next) => {
+router.patch("/:id",   authHandler, async (req, res, next) => {
     try {
-      const { id } = req.params;
-  
-      const postUpdated = await post.patch(id, { ...req.body });
-  
+
+
+        const { id } = req.params;
+        const { sub } = req.params.tokenPayload;
+        
+        let postUpdated;
+        const permisoParaActualizar = await post.verifyUserId(id, sub);
+        if(permisoParaActualizar)
+        {
+            console.log("update")
+            postUpdated = await post.patch(id, { ...req.body });
+        }
+        else
+        {
+            throw new Error("No tienes permisos para actualizar este post");
+        }
+
+
       res.json({
         success: true,
         message: `Post ${id} actualizado`,
@@ -126,13 +144,14 @@ router.patch("/:id",   async (req, res, next) => {
     }
   });
   
-  router.delete("/:id",    async (req, res, next) => {
+  router.delete("/:id",   authHandler, async (req, res, next) => {
     try {
       const { id } = req.params;
       const { sub } = req.params.tokenPayload;
       
       let postDeleted;
-      if(await post.verifyUserId(id, sub))
+      const permisoParaBorrar = await post.verifyUserId(id, sub);
+      if(permisoParaBorrar)
       {
           console.log("borrar")
         postDeleted = await post.del(id);
